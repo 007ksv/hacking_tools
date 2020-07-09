@@ -1,10 +1,20 @@
 #!/usr/bin/python
 
+"""
+Usage python2 linuxPassCracker.py <passWordListHere>
+
+by keshav sain
+
+Follow: https://www.github.com/007ksv
+"""
+
 import crypt
 import subprocess
 import time
 import sys
 
+print """
+\t\t\t\t follow: https://www.github.com/007ksv"""
 if len(sys.argv)==2:
 	passFile = sys.argv[1]
 else:
