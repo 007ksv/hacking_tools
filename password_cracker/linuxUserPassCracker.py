@@ -46,8 +46,8 @@ try:
 except:
 	print "[-] File not found"
 counter=0
+start = time.time()
 for password in f:
-	start = time.time()
 	counter=counter+1
 	hash = crypt.crypt(password.strip(), salt)
 	if hash == actualHash:
